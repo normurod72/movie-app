@@ -1,7 +1,8 @@
 import * as React from 'react';
 import './index.less';
-import { Input } from 'antd';
+import { Input, Card, Tag, Rate } from 'antd';
 import { connect } from "react-redux";
+import { Container, Row, Col } from 'react-grid-system';
 import { fetchMovies, fetchGenres, updatePage } from '../../redux/actions';
 import EventListener, { withOptions } from 'react-event-listener';
 
@@ -31,25 +32,106 @@ class Movie extends React.Component<Props> {
     render() {
         const { movies, genres } = this.props;
         const { Search } = Input;
+        const { Meta } = Card;
         if (!genres.fetching) {
             console.log(genres.data);
         }
         return (
             <div className="movie">
                 <div className="searchbox">
-                    <Search
-                        size="large"
-                        placeholder="input search text"
-                        onSearch={value => console.log(value)}
-                    />
+                    <Container>
+                        <Row justify="center">
+                            <Col sm={8}>
+                                <Search
+                                    size="large"
+                                    placeholder="input search text"
+                                    onSearch={value => console.log(value)}
+                                />
+                            </Col>
+                        </Row>
+                    </Container>
                 </div>
-                <EventListener
-                    target="window"
-                    onScroll={withOptions(this.handleScroll, { passive: true, capture: false })}
-                />
                 {(
-                    <div className="movie">
-                        <h2>Movies list</h2>
+                    <div className="movie-grid">
+                        <Container fluid={true}>
+                            <h2>Movies list</h2>
+                            <Row justify="between">
+                                <Col>
+                                    <Card
+                                        className="movie-card"
+                                        hoverable={true}
+                                        cover={<img alt="example" src="http://image.tmdb.org/t/p/w185/xnopI5Xtky18MPhK40cZAGAOVeV.jpg" />}
+                                    >
+                                        <Meta
+                                            title="Europe Street beat"
+                                            description="March 23, 2019"
+                                        />
+                                        <div className="movie-genres">
+                                            <Tag color="magenta">magenta</Tag>
+                                            <Tag color="purple">red</Tag>
+                                            <Tag color="volcano">volcano</Tag>
+                                            <Tag color="orange">orange</Tag>
+                                        </div>
+                                        <Rate disabled={true} defaultValue={2} />
+                                    </Card>
+                                </Col>
+                                <Col>
+                                    <Card
+                                        className="movie-card"
+                                        hoverable={true}
+                                        cover={<img alt="example" src="http://image.tmdb.org/t/p/w185/xnopI5Xtky18MPhK40cZAGAOVeV.jpg" />}
+                                    >
+                                        <Meta
+                                            title="Europe Street beat"
+                                            description="March 23, 2019"
+                                        />
+                                        <div>
+                                            <Tag color="magenta">magenta</Tag>
+                                            <Tag color="purple">red</Tag>
+                                            <Tag color="volcano">volcano</Tag>
+                                            <Tag color="orange">orange</Tag>
+                                        </div>
+                                    </Card>
+                                </Col>
+                                <Col>
+                                    <Card
+                                        className="movie-card"
+                                        hoverable={true}
+                                        cover={<img alt="example" src="http://image.tmdb.org/t/p/w185/xnopI5Xtky18MPhK40cZAGAOVeV.jpg" />}
+                                    >
+                                        <Meta
+                                            title="Europe Street beat"
+                                            description="March 23, 2019"
+                                        />
+                                        <div>
+                                            <Tag color="magenta">magenta</Tag>
+                                            <Tag color="purple">red</Tag>
+                                            <Tag color="volcano">volcano</Tag>
+                                            <Tag color="orange">orange</Tag>
+                                        </div>
+                                    </Card>
+                                </Col>
+                                <Col>
+                                    <Card
+                                        className="movie-card"
+                                        hoverable={true}
+                                        cover={<img alt="example" src="http://image.tmdb.org/t/p/w185/xnopI5Xtky18MPhK40cZAGAOVeV.jpg" />}
+                                    >
+                                        <Meta
+                                            title="Europe Street beat"
+                                            description="March 23, 2019"
+                                        />
+                                        <div>
+                                            <Tag color="magenta">magenta</Tag>
+                                            <Tag color="purple">red</Tag>
+                                            <Tag color="volcano">volcano</Tag>
+                                            <Tag color="orange">orange</Tag>
+                                        </div>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Container>
+
                         <div>
                             {this.renderMovies(movies.data)}
                         </div>
@@ -57,7 +139,10 @@ class Movie extends React.Component<Props> {
                 )}
                 {movies.fetching && "Fetching data ..."}
                 {movies.error && <p style={{ color: "red" }}>Uh oh - something went wrong!</p>}
-
+                <EventListener
+                    target="window"
+                    onScroll={withOptions(this.handleScroll, { passive: true, capture: false })}
+                />
             </div>
         );
     }
