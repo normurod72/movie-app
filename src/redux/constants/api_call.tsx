@@ -1,5 +1,5 @@
 // action types
-const P="API_CALL_";
+const P = "API_CALL_";
 
 export const API_CALL_REQUEST = `${P}REQUEST`;
 export const API_CALL_SUCCESS = `${P}SUCCESS`;
