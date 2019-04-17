@@ -6,11 +6,18 @@ import EventListener, { withOptions } from 'react-event-listener';
 import StarRatings from 'react-star-ratings';
 
 import './index.less';
-import { fetchMovies, fetchGenres, updatePage } from '../../redux/actions';
+import { fetchMovies, fetchGenres, updatePage, searchMovies } from '../../redux/actions';
 import { formatDate} from '../../utils';
 import Genre from '../genre';
 
-export interface Props { movies: any, genres: any, onRequestMovie: any, onRequestGenre: any, onNewPageRequest: any };
+export interface Props { 
+    movies: any, 
+    genres: any, 
+    onRequestMovie: any, 
+    onRequestGenre: any, 
+    onNewPageRequest: any,
+    onSearchMovie:any 
+};
 
 class Movie extends React.Component<Props> {
 
@@ -27,6 +34,11 @@ class Movie extends React.Component<Props> {
     componentDidMount() {
         this.props.onRequestGenre();
         this.props.onRequestMovie();
+    }
+
+    onSearch=(e:any)=>{
+        console.log(e.currentTarget.value);
+        this.props.onSearchMovie(e.currentTarget.value);
     }
 
     renderMovies(movies: any[]) {
@@ -64,11 +76,8 @@ class Movie extends React.Component<Props> {
     }
 
     render() {
-        const { movies, genres } = this.props;
+        const { movies} = this.props;
         const { Search } = Input;
-        if (!genres.fetching) {
-            console.log(genres.data);
-        }
         return (
             <div className="movie">
                 <div className="searchbox">
@@ -77,8 +86,8 @@ class Movie extends React.Component<Props> {
                             <Col sm={8}>
                                 <Search
                                     size="large"
-                                    placeholder="input search text"
-                                    onSearch={value => console.log(value)}
+                                    placeholder="Enter the movie name you want to watch"
+                                    onChange={this.onSearch}
                                 />
                             </Col>
                         </Row>
@@ -89,7 +98,7 @@ class Movie extends React.Component<Props> {
                         <Container fluid={true}>
                             <h2>Movies list</h2>
                             <Row justify="between">
-                                {this.renderMovies(movies.data)}
+                                {movies.data.length!==0 && this.renderMovies(movies.data)}
                             </Row>
                         </Container>
                     </div>
@@ -111,9 +120,10 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    onNewPageRequest: updatePage(dispatch),
     onRequestMovie: fetchMovies(dispatch),
-    onRequestGenre: fetchGenres(dispatch)
+    onRequestGenre: fetchGenres(dispatch),
+    onNewPageRequest: updatePage(dispatch),
+    onSearchMovie:(query:string)=>searchMovies(dispatch, query)()
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Movie);
