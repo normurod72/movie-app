@@ -20,8 +20,6 @@ export function fetchGenres() {
 }
 
 export function searchMovies(query:string, page:number) {
-    console.log(query, page);
-    
     return axios({
         method: "get",
         url: `${API_URL}search/movie?api_key=${API_KEY}&language=${API_LANG}&query=${query}&page=${page}&include_adult=${API_INCLUDE_ADULT}`

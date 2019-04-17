@@ -1,45 +1,19 @@
 import * as React from 'react';
-import { Input, Card } from 'antd';
-import { connect } from "react-redux";
+import { Card } from 'antd';
 import { Container, Row, Col } from 'react-grid-system';
-import EventListener, { withOptions } from 'react-event-listener';
 import StarRatings from 'react-star-ratings';
 
-import './index.less';
-import { fetchMovies, fetchGenres, updatePage, searchMovies } from '../../redux/actions';
-import { formatDate} from '../../utils';
-import Genre from '../genre';
+import { formatDate } from '../../utils';
+import GenreTags from '../genre_tags';
 
-export interface Props { 
-    movies: any, 
-    genres: any, 
-    onRequestMovie: any, 
-    onRequestGenre: any, 
-    onNewPageRequest: any,
-    onSearchMovie:any 
+import './index.less';
+
+export interface Props {
+    movies: any,
+    genres: any
 };
 
 class Movie extends React.Component<Props> {
-
-    handleScroll = (e: any) => {
-        const target = e.target.scrollingElement;
-        if (target.offsetHeight + target.scrollTop >= target.scrollHeight) {
-            console.log('loadmore');
-            if (!this.props.movies.fetching) {
-                this.props.onNewPageRequest();
-            }
-        }
-    };
-
-    componentDidMount() {
-        this.props.onRequestGenre();
-        this.props.onRequestMovie();
-    }
-
-    onSearch=(e:any)=>{
-        console.log(e.currentTarget.value);
-        this.props.onSearchMovie(e.currentTarget.value);
-    }
 
     renderMovies(movies: any[]) {
         const { Meta } = Card;
@@ -48,18 +22,18 @@ class Movie extends React.Component<Props> {
                 <Card
                     className="movie-card"
                     hoverable={true}
-                    cover={<img alt="example" src={"http://image.tmdb.org/t/p/w185"+movie.poster_path} />}
+                    cover={<img alt="example" src={"http://image.tmdb.org/t/p/w185" + movie.poster_path} />}
                 >
                     <div className="movie-card__top">
                         <Meta
                             title={movie.original_title}
                             description={formatDate(movie.release_date)}
                         />
-                        <Genre genres_ids={movie.genre_ids} genres={this.props.genres.data} />
+                        <GenreTags genres_ids={movie.genre_ids} genres={this.props.genres.data} />
                     </div>
                     <div className="movie-card__bottom">
                         <StarRatings
-                            rating={movie.vote_average/2}
+                            rating={movie.vote_average / 2}
                             starRatedColor="#fadb14"
                             starEmptyColor="#e8e8e8"
                             numberOfStars={5}
@@ -76,54 +50,23 @@ class Movie extends React.Component<Props> {
     }
 
     render() {
-        const { movies} = this.props;
-        const { Search } = Input;
+        const { movies } = this.props;
         return (
             <div className="movie">
-                <div className="searchbox">
-                    <Container>
-                        <Row justify="center">
-                            <Col sm={8}>
-                                <Search
-                                    size="large"
-                                    placeholder="Enter the movie name you want to watch"
-                                    onChange={this.onSearch}
-                                />
-                            </Col>
+                <div className="movie-grid">
+                    <Container fluid={true}>
+                        <h2>Movies list</h2>
+                        <Row justify="between">
+                            {movies.data.length !== 0 && this.renderMovies(movies.data)}
                         </Row>
                     </Container>
                 </div>
-                {(
-                    <div className="movie-grid">
-                        <Container fluid={true}>
-                            <h2>Movies list</h2>
-                            <Row justify="between">
-                                {movies.data.length!==0 && this.renderMovies(movies.data)}
-                            </Row>
-                        </Container>
-                    </div>
-                )}
                 {movies.fetching && "Fetching data ..."}
                 {movies.error && <p style={{ color: "red" }}>Uh oh - something went wrong!</p>}
-                <EventListener
-                    target="window"
-                    onScroll={withOptions(this.handleScroll, { passive: true, capture: false })}
-                />
             </div>
         );
     }
 }
 
-const mapStateToProps = (state: any) => ({
-    movies: state.movies,
-    genres: state.genres
-});
 
-const mapDispatchToProps = (dispatch: any) => ({
-    onRequestMovie: fetchMovies(dispatch),
-    onRequestGenre: fetchGenres(dispatch),
-    onNewPageRequest: updatePage(dispatch),
-    onSearchMovie:(query:string)=>searchMovies(dispatch, query)()
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Movie);
+export default Movie;
