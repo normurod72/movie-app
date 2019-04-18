@@ -11,16 +11,17 @@ export function* watcherSaga() {
         takeLatest(MOVIE+NEW_PAGE, fetchMoviesSaga),
         takeLatest(GENRE+API_CALL_REQUEST, fetchGenresSaga),
         takeLatest(SEARCH+API_CALL_REQUEST, fetchSearchSaga),
+        takeLatest(SEARCH+NEW_PAGE, fetchSearchSaga)
     ]);
 }
 
-const getCurrentPage=(state:any)=>state.movies.page;
 const getSearchState=(state:any)=>state.search;
+const getMoviesState=(state:any)=>state.movies;
 
 function* fetchMoviesSaga() {    
     try {
-        const page=yield select(getCurrentPage);
-        const response = yield call(fetchMovies,page);
+        const movies=yield select(getMoviesState);
+        const response = yield call(fetchMovies,movies.page);
         const data = response.data.results;
         yield put({ type: MOVIE+API_CALL_SUCCESS, data });
     } catch (error) {
@@ -30,14 +31,19 @@ function* fetchMoviesSaga() {
 
 function* fetchSearchSaga() {    
     try {
-        yield delay(2000);
         const state=yield select(getSearchState);
+        if(state.page===1){
+            yield delay(2000);
+        }
         const response = yield call(searchMovies,state.query,state.page);
         const data = response.data.results;
-        console.log(response);
-        yield put({ type: SEARCH+API_CALL_SUCCESS, data });
+        if(state.page===1){
+            yield put({ type: MOVIE+SEARCH+API_CALL_SUCCESS, data });
+        }else{
+            yield put({ type: MOVIE+API_CALL_SUCCESS, data });
+        }
     } catch (error) {
-        yield put({ type: SEARCH+API_CALL_FAILURE, error });
+        yield put({ type: MOVIE+API_CALL_FAILURE, error });
     }
 }
 

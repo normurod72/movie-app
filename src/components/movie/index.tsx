@@ -10,7 +10,8 @@ import './index.less';
 
 export interface Props {
     movies: any,
-    genres: any
+    genres: any,
+    title:string
 };
 
 class Movie extends React.Component<Props> {
@@ -50,12 +51,12 @@ class Movie extends React.Component<Props> {
     }
 
     render() {
-        const { movies } = this.props;
+        const { movies, title } = this.props;
         return (
             <div className="movie">
                 <div className="movie-grid">
                     <Container fluid={true}>
-                        <h2>Movies list</h2>
+                        <h2>{title}</h2>
                         <Row justify="between">
                             {movies.data.length !== 0 && this.renderMovies(movies.data)}
                         </Row>

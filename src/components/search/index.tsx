@@ -15,6 +15,7 @@ const Search : React.FC<Props> = ({onSearch}:Props)=>(
                         size="large"
                         placeholder="Enter the movie name you want to watch"
                         onChange={onSearch}
+                        onSearch={onSearch}
                     />
                 </Col>
             </Row>
