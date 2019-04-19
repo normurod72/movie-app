@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { connect } from "react-redux";
-import EventListener, { withOptions } from 'react-event-listener';
-import { Button, BackTop, Icon } from 'antd';
+import { BrowserRouter as Router, Route, Redirect, Switch} from "react-router-dom";
+import Home from './components/home';
+import MovieDetails from './components/movie_details';
+import NotFound from './components/not_found';
 
-import logo from './assets/images/logo.png';
-import Movie from './components/movie';
-import Search from './components/search';
 import { 
     fetchMovies, 
     fetchGenres, 
     updatePage, 
     updatePageSearch,
-    searchMovies 
+    searchMovies,
+    getMovieDetails 
 } from './redux/actions';
 
 import './App.less';
@@ -25,7 +25,8 @@ export interface AppProps {
     onRequestGenre: any, 
     onNewPageRequest: any,
     onNewSearchPageRequest:any,
-    onSearchMovie:any,  
+    onSearchMovie:any,
+    onNewSelectedMovieDetails:any  
 };
 
 class App extends React.Component<AppProps> {
@@ -43,8 +44,8 @@ class App extends React.Component<AppProps> {
     };
 
     componentDidMount() {
-        this.props.onRequestGenre();
-        this.props.onRequestMovie();
+        //this.props.onRequestGenre();
+        //this.props.onRequestMovie();
     }
 
     onSearch=(e:any)=>{
@@ -59,6 +60,10 @@ class App extends React.Component<AppProps> {
         this.props.onRequestMovie();
     }
 
+    onMovieDetails=()=>{
+        this.props.onNewSelectedMovieDetails();
+    }
+
     render() {
         if(this.props.search.data.length){
             console.log(this.props.search);
@@ -66,38 +71,28 @@ class App extends React.Component<AppProps> {
         if(this.props.movies.data.length){
             console.log(this.props.movies.data);
         }        
-        const {movies, genres}=this.props;
+        const {movies, genres} = this.props;
         return (
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    {
-                        movies.type==='search' &&
-                        <Button onClick={this.onPopularMovies} size={"large"}><Icon type="left" /> Back to popular movies</Button>
-                    }
-                </header>
-                
-                <Search 
-                    onSearch={this.onSearch} 
-                />
-                
-                <Movie 
-                    movies={movies} 
-                    genres={genres}
-                    title={movies.type==='movie' ? 'Popular Movies':'Search Results'} 
-                />
-
-                <EventListener
-                    target="window"
-                    onScroll={withOptions(this.onScroll, { passive: true, capture: false })}
-                />
-
-                <BackTop>
-                    <div className="ant-back-top-inner">
-                        <Icon type="arrow-up" />
-                    </div>
-                </BackTop>
-            </div>
+            <Router>
+                <Switch>
+                    <Route path="/home" 
+                        render={props=><Home {...props} 
+                            movies={movies} 
+                            genres={genres} 
+                            onPopularMovies={this.onPopularMovies}
+                            onScroll={this.onScroll}
+                            onSearch={this.onSearch}
+                        />} />
+                    <Route 
+                        path="/details/:id" 
+                        render={props=><MovieDetails {...props} 
+                            onMovieDetails={(id:number)=>this.props.onNewSelectedMovieDetails(id)} 
+                            movieDetails={[]} 
+                        />} />
+                    <Redirect from="/" exact={true} to="/home" />
+                    <Route component={NotFound}/>
+                </Switch>
+            </Router>
         );
     }
 }
@@ -115,6 +110,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     onRequestGenre: fetchGenres(dispatch),
     onNewPageRequest: updatePage(dispatch),
     onNewSearchPageRequest: updatePageSearch(dispatch),
+    onNewSelectedMovieDetails:(id:number)=>getMovieDetails(dispatch, id)(),
     onSearchMovie:(query:string)=>searchMovies(dispatch, query)()
 });
 

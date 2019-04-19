@@ -1,7 +1,7 @@
 import { takeLatest, call, put, all, select, delay} from "redux-saga/effects";
 import { API_CALL_REQUEST, API_CALL_SUCCESS, API_CALL_FAILURE} from '../constants/api_call';
-import {MOVIE, GENRE, NEW_PAGE, SEARCH} from '../constants/types';
-import {fetchMovies, fetchGenres, searchMovies} from './functions';
+import {MOVIE, GENRE, NEW_PAGE, SEARCH, DETAILS} from '../constants/types';
+import {fetchMovies, fetchGenres, searchMovies, fetchMovieDetails} from './functions';
 
 
 // watcher saga: watches for actions dispatched to the store, starts worker saga
@@ -11,12 +11,23 @@ export function* watcherSaga() {
         takeLatest(MOVIE+NEW_PAGE, fetchMoviesSaga),
         takeLatest(GENRE+API_CALL_REQUEST, fetchGenresSaga),
         takeLatest(SEARCH+API_CALL_REQUEST, fetchSearchSaga),
-        takeLatest(SEARCH+NEW_PAGE, fetchSearchSaga)
+        takeLatest(SEARCH+NEW_PAGE, fetchSearchSaga),
+        takeLatest(DETAILS+API_CALL_REQUEST, fetchMovieDetailsSaga)
     ]);
 }
 
 const getSearchState=(state:any)=>state.search;
 const getMoviesState=(state:any)=>state.movies;
+
+function* fetchMovieDetailsSaga(payload:any){
+    try {
+        const data = yield call(fetchMovieDetails,payload.id);
+        yield put({ type: DETAILS+API_CALL_SUCCESS, data });
+    } catch (error) {
+        yield put({ type: DETAILS+API_CALL_FAILURE, error });
+    }
+}
+
 
 function* fetchMoviesSaga() {    
     try {

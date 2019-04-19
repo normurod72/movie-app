@@ -25,3 +25,10 @@ export function searchMovies(query:string, page:number) {
         url: `${API_URL}search/movie?api_key=${API_KEY}&language=${API_LANG}&query=${query}&page=${page}&include_adult=${API_INCLUDE_ADULT}`
     });
 }
+
+export function fetchMovieDetails(id:string) {
+    return axios({
+        method: "get",
+        url: `${API_URL}movie/${id}?api_key=${API_KEY}`
+    });
+}

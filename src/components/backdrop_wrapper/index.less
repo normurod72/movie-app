@@ -1,0 +1,20 @@
+.flat-wall{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.backdrop{
+    background: url(../../assets/images/background.jpg), linear-gradient(#000, #1d5d29, #00d474);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #c7c7c7;
+    .flat-wall();
+    /* background-blend-mode: luminosity,overlay; */
+}
+.backdrop-wrapper{
+    background: linear-gradient(#fdfdfda6,#ffffffed, white);
+    .flat-wall();
+}
