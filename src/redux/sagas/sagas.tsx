@@ -21,8 +21,8 @@ const getMoviesState=(state:any)=>state.movies;
 
 function* fetchMovieDetailsSaga(payload:any){
     try {
-        const data = yield call(fetchMovieDetails,payload.id);
-        yield put({ type: DETAILS+API_CALL_SUCCESS, data });
+        const response = yield call(fetchMovieDetails,payload.id);
+        yield put({ type: DETAILS+API_CALL_SUCCESS, data:response.data });
     } catch (error) {
         yield put({ type: DETAILS+API_CALL_FAILURE, error });
     }

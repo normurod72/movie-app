@@ -8,10 +8,10 @@ import NotFound from './components/not_found';
 import { 
     fetchMovies, 
     fetchGenres, 
-    updatePage, 
-    updatePageSearch,
+    fetchNewMovies, 
+    fetchNewSearchMovies,
     searchMovies,
-    getMovieDetails 
+    fetchMovieDetails 
 } from './redux/actions';
 
 import './App.less';
@@ -20,7 +20,8 @@ export interface AppProps {
     movies: any, 
     genres: any, 
     search: any,
-    current:any, 
+    current:any,
+    details:any, 
     onRequestMovie: any, 
     onRequestGenre: any, 
     onNewPageRequest: any,
@@ -70,8 +71,11 @@ class App extends React.Component<AppProps> {
         }
         if(this.props.movies.data.length){
             console.log(this.props.movies.data);
+        }
+        if(this.props.details){
+            // console.log(this.props.details);
         }        
-        const {movies, genres} = this.props;
+        const {movies, genres, details} = this.props;
         return (
             <Router>
                 <Switch>
@@ -87,7 +91,7 @@ class App extends React.Component<AppProps> {
                         path="/details/:id" 
                         render={props=><MovieDetails {...props} 
                             onMovieDetails={(id:number)=>this.props.onNewSelectedMovieDetails(id)} 
-                            movieDetails={[]} 
+                            movieDetails={...details} 
                         />} />
                     <Redirect from="/" exact={true} to="/home" />
                     <Route component={NotFound}/>
@@ -102,15 +106,16 @@ const mapStateToProps = (state: any) => ({
     movies: state.movies,
     genres: state.genres,
     search: state.search,
-    current: state.current
+    current: state.current,
+    details: state.details
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
     onRequestMovie: fetchMovies(dispatch),
     onRequestGenre: fetchGenres(dispatch),
-    onNewPageRequest: updatePage(dispatch),
-    onNewSearchPageRequest: updatePageSearch(dispatch),
-    onNewSelectedMovieDetails:(id:number)=>getMovieDetails(dispatch, id)(),
+    onNewPageRequest: fetchNewMovies(dispatch),
+    onNewSearchPageRequest: fetchNewSearchMovies(dispatch),
+    onNewSelectedMovieDetails:(id:number)=>fetchMovieDetails(dispatch, id)(),
     onSearchMovie:(query:string)=>searchMovies(dispatch, query)()
 });
 

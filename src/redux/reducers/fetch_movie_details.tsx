@@ -3,14 +3,14 @@ import { DETAILS } from '../constants/types';
 
 const initialState = {
     fetching: false,
-    data: [],
+    data: null,
     error: null
 };
 
 export default function (state = initialState, action: any) {
     switch (action.type) {
         case DETAILS+API_CALL_REQUEST:            
-            return { ...state, fetching: true, error: null, query:action.query };
+            return { ...state, fetching: true, error: null };
         case DETAILS+API_CALL_SUCCESS:
             return { ...state, fetching: false, data:action.data };
         case DETAILS+API_CALL_FAILURE:
