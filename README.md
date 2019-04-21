@@ -1,4 +1,4 @@
-# This is a Movie-app frontend application uses The Movie Database API
+# This is a Movie-app. Frontend application that uses The Movie Database API
 ## Single page application built on React
 
-This is very simple that only shows popular movies and have the functionality of showing details of single movie and also seaching by movie name
+Very simple application that shows popular movies and have the functionality of showing details of single movie and also searching by movie name

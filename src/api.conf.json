@@ -1,0 +1,12 @@
+{
+    "API_URL":"https://api.themoviedb.org/3/",
+    "API_KEY":"fba25a747e5eb376b92c5512b70ab449",
+    "API_LANG":"en-US",
+    "API_INCLUDE_ADULT":false,
+    "API_IMG_URL":"http://image.tmdb.org/t/p/",
+    "API_IMG_POSTER_SIZE":"w342",
+    "API_IMG_PLACEHOLDER_SIZE":"w45",
+    "API_IMG_BACKDROP_SIZE":"original",
+    "NO_PHOTO_SRC":"https://dummyimage.com/165x273/454545/fff.png&text=No+photo",
+    "HOME_BACKDROP_IMG":"bi4jh0Kt0uuZGsGJoUUfqmbrjQg.jpg"
+}

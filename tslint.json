@@ -14,6 +14,8 @@
     "member-access": [true, "no-public"],
     "no-console": false,
     "object-literal-sort-keys": false,
-    "comment-format": [false]
+    "comment-format": [false],
+    "no-uninitialized": [false],
+    "no-shadowed-variable": false
   }
 }

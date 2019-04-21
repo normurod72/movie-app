@@ -11,7 +11,9 @@ import {
     fetchNewMovies, 
     fetchNewSearchMovies,
     searchMovies,
-    fetchMovieDetails 
+    fetchMovieDetails,
+    fetchMovieRecommendations,
+    fetchSimilarMovies 
 } from './redux/actions';
 
 import './App.less';
@@ -22,76 +24,103 @@ export interface AppProps {
     search: any,
     current:any,
     details:any, 
+    recommendations:any,
+    similar:any,
     onRequestMovie: any, 
     onRequestGenre: any, 
     onNewPageRequest: any,
     onNewSearchPageRequest:any,
     onSearchMovie:any,
-    onNewSelectedMovieDetails:any  
+    onNewSelectedMovieDetails:any,
+    onMovieRecommendations:any,
+    onSimilarMovies:any  
 };
 
-class App extends React.Component<AppProps> {
+export interface AppState{
+    currentSource:'movie'|'search', 
+    searchQuery:string
+};
 
-    onScroll = (e: any) => {
-        const target = e.target.scrollingElement;
-        if (target.offsetHeight + target.scrollTop >= target.scrollHeight && !this.props.movies.fetching) {
-            if(this.props.movies.type==='movie'){
-                this.props.onNewPageRequest();
-            }
-            if(this.props.movies.type==='search'){
-                this.props.onNewSearchPageRequest();
-            }            
+class App extends React.Component<AppProps,AppState> {
+
+    constructor(props:AppProps){
+        super(props);
+        this.state={
+            currentSource:'movie',
+            searchQuery:''
         }
-    };
+    }
+
+    onNewPageRequest=(pageNumber:number)=>{
+        window.scrollTo(0, 0);
+        console.log('Page: ', pageNumber);
+        if(this.state.currentSource==='movie'){
+            this.props.onRequestMovie(pageNumber);
+        }else{
+            this.props.onSearchMovie(this.state.searchQuery,pageNumber);
+        }
+    }
 
     componentDidMount() {
-        //this.props.onRequestGenre();
-        //this.props.onRequestMovie();
+        this.props.onRequestGenre();
+        this.props.onRequestMovie(1);
     }
 
     onSearch=(e:any)=>{
-        if(typeof e === 'string'){
-            this.props.onSearchMovie(e);
-        }else{
-            this.props.onSearchMovie(e.currentTarget.value);
+        if(e.trim()!==this.state.searchQuery.trim()){
+            if(e.trim()!==''){
+                this.setState({currentSource:'search'});
+                this.props.onSearchMovie(e, 1);
+            }else{
+                this.setState({currentSource:'movie', searchQuery:''});
+            }
         }
+        this.setState({searchQuery:e});
     }
 
     onPopularMovies=(e:any)=>{
-        this.props.onRequestMovie();
+        this.setState({currentSource:'movie', searchQuery:''});
     }
 
     onMovieDetails=()=>{
         this.props.onNewSelectedMovieDetails();
     }
 
-    render() {
-        if(this.props.search.data.length){
-            console.log(this.props.search);
-        }
-        if(this.props.movies.data.length){
-            console.log(this.props.movies.data);
-        }
-        if(this.props.details){
-            // console.log(this.props.details);
-        }        
-        const {movies, genres, details} = this.props;
+    onMovieRecommendations=()=>{
+        this.props.onMovieRecommendations();
+    }
+
+    onSimilarMovies=()=>{
+        this.props.onSimilarMovies();
+    }
+
+    render() {               
+        const {movies, genres, details, similar, recommendations, search} = this.props;
+        console.log(movies);
+        
         return (
             <Router>
                 <Switch>
                     <Route path="/home" 
                         render={props=><Home {...props} 
-                            movies={movies} 
+                            movies={this.state.currentSource==='movie' ? movies: search} 
+                            type={this.state.currentSource}
+                            searchQuery={this.state.searchQuery}
                             genres={genres} 
                             onPopularMovies={this.onPopularMovies}
-                            onScroll={this.onScroll}
+                            onNewPageRequest={this.onNewPageRequest}
                             onSearch={this.onSearch}
                         />} />
                     <Route 
                         path="/details/:id" 
                         render={props=><MovieDetails {...props} 
                             onMovieDetails={(id:number)=>this.props.onNewSelectedMovieDetails(id)} 
-                            movieDetails={...details} 
+                            movieDetails={...details}
+                            recommendations={recommendations}
+                            similar={similar}
+                            allGenres={genres.data}
+                            onSimilarMovies={(id:number)=>this.props.onSimilarMovies(id)} 
+                            onMovieRecommendations={(id:number)=>this.props.onMovieRecommendations(id)} 
                         />} />
                     <Redirect from="/" exact={true} to="/home" />
                     <Route component={NotFound}/>
@@ -107,16 +136,20 @@ const mapStateToProps = (state: any) => ({
     genres: state.genres,
     search: state.search,
     current: state.current,
-    details: state.details
+    details: state.details,
+    recommendations:state.recommendations,
+    similar:state.similar
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    onRequestMovie: fetchMovies(dispatch),
+    onRequestMovie: (page:number)=>fetchMovies(dispatch, page)(),
     onRequestGenre: fetchGenres(dispatch),
     onNewPageRequest: fetchNewMovies(dispatch),
     onNewSearchPageRequest: fetchNewSearchMovies(dispatch),
     onNewSelectedMovieDetails:(id:number)=>fetchMovieDetails(dispatch, id)(),
-    onSearchMovie:(query:string)=>searchMovies(dispatch, query)()
+    onMovieRecommendations:(id:number)=>fetchMovieRecommendations(dispatch, id)(),
+    onSimilarMovies:(id:number)=>fetchSimilarMovies(dispatch, id)(),
+    onSearchMovie:(query:string, page:number)=>searchMovies(dispatch, query, page)()
 });
 
 export default connect(mapStateToProps,mapDispatchToProps)(App);

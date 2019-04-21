@@ -1,7 +1,7 @@
-import { takeLatest, call, put, all, select, delay} from "redux-saga/effects";
+import { takeLatest, call, put, all, delay} from "redux-saga/effects";
 import { API_CALL_REQUEST, API_CALL_SUCCESS, API_CALL_FAILURE} from '../constants/api_call';
-import {MOVIE, GENRE, NEW_PAGE, SEARCH, DETAILS} from '../constants/types';
-import {fetchMovies, fetchGenres, searchMovies, fetchMovieDetails} from './functions';
+import {MOVIE, GENRE, NEW_PAGE, SEARCH, DETAILS, RECOMMENDATIONS, SIMILAR_MOVIES} from '../constants/types';
+import {fetchMovies, fetchGenres, searchMovies, fetchMovieDetails, fetchMovieRecommendations, fetchSimilarMovies} from './functions';
 
 
 // watcher saga: watches for actions dispatched to the store, starts worker saga
@@ -12,12 +12,11 @@ export function* watcherSaga() {
         takeLatest(GENRE+API_CALL_REQUEST, fetchGenresSaga),
         takeLatest(SEARCH+API_CALL_REQUEST, fetchSearchSaga),
         takeLatest(SEARCH+NEW_PAGE, fetchSearchSaga),
-        takeLatest(DETAILS+API_CALL_REQUEST, fetchMovieDetailsSaga)
+        takeLatest(DETAILS+API_CALL_REQUEST, fetchMovieDetailsSaga),
+        takeLatest(RECOMMENDATIONS+API_CALL_REQUEST, fetchMovieRecommendationsSaga),
+        takeLatest(SIMILAR_MOVIES+API_CALL_REQUEST, fetchSimilarMoviesSaga),
     ]);
 }
-
-const getSearchState=(state:any)=>state.search;
-const getMoviesState=(state:any)=>state.movies;
 
 function* fetchMovieDetailsSaga(payload:any){
     try {
@@ -28,33 +27,42 @@ function* fetchMovieDetailsSaga(payload:any){
     }
 }
 
-
-function* fetchMoviesSaga() {    
+function* fetchMovieRecommendationsSaga(payload:any){
     try {
-        const movies=yield select(getMoviesState);
-        const response = yield call(fetchMovies,movies.page);
-        const data = response.data.results;
-        yield put({ type: MOVIE+API_CALL_SUCCESS, data });
+        const response = yield call(fetchMovieRecommendations,payload.id);
+        yield put({ type: RECOMMENDATIONS+API_CALL_SUCCESS, data:response.data });
+    } catch (error) {
+        yield put({ type: RECOMMENDATIONS+API_CALL_FAILURE, error });
+    }
+}
+
+function* fetchSimilarMoviesSaga(payload:any){
+    try {
+        const response = yield call(fetchSimilarMovies,payload.id);
+        yield put({ type: SIMILAR_MOVIES+API_CALL_SUCCESS, data:response.data });
+    } catch (error) {
+        yield put({ type: SIMILAR_MOVIES+API_CALL_FAILURE, error });
+    }
+}
+
+function* fetchMoviesSaga(payload:any) {
+    try {
+        const response = yield call(fetchMovies,payload.page);
+        yield put({ type: MOVIE+API_CALL_SUCCESS, ...response.data });
     } catch (error) {
         yield put({ type: MOVIE+API_CALL_FAILURE, error });
     }
 }
 
-function* fetchSearchSaga() {    
+function* fetchSearchSaga(payload:any) {    
     try {
-        const state=yield select(getSearchState);
-        if(state.page===1){
-            yield delay(2000);
-        }
-        const response = yield call(searchMovies,state.query,state.page);
-        const data = response.data.results;
-        if(state.page===1){
-            yield put({ type: MOVIE+SEARCH+API_CALL_SUCCESS, data });
-        }else{
-            yield put({ type: MOVIE+API_CALL_SUCCESS, data });
-        }
+        if(payload.page===1){yield delay(1000);}
+        
+        const response = yield call(searchMovies,payload.query,payload.page);
+        console.log(response);
+        yield put({ type: SEARCH+API_CALL_SUCCESS, ...response.data });
     } catch (error) {
-        yield put({ type: MOVIE+API_CALL_FAILURE, error });
+        yield put({ type: SEARCH+API_CALL_FAILURE, error });
     }
 }
 

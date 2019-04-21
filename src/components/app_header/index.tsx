@@ -9,7 +9,7 @@ interface Props { showButton:boolean, onPopularMovies:any };
 const AppHeader : React.FC<Props> = ({showButton, onPopularMovies}:Props)=>(
     <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        {showButton && <Button type="dashed" onClick={onPopularMovies} size={"large"}><Icon type="left" /> Back to popular movies</Button>}
+        {showButton && <Button type="dashed" onClick={onPopularMovies} size={"large"}><Icon type="left" /> Back to home</Button>}
     </header>
 );
 
