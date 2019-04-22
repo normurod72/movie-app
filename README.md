@@ -2,6 +2,8 @@
 
 This app is a, movie listing app that uses The Movie Database API. ReactJS powered.
 
+### On heroku 
+* [rc-movie-app.herokuapp.com](https://rc-movie-app.herokuapp.com/home)
 # Techs
   - Typescript
   - ReactJS
@@ -44,17 +46,10 @@ $ npm install -d
 $ npm start
 ```
 
-For production environments...
+Verify the installation by navigating to your server address in your preferred browser.
 
 ```sh
-$ npm install --production
-$ NODE_ENV=production node app
-```
-
-Verify the deployment by navigating to your server address in your preferred browser.
-
-```sh
-127.0.0.1:8000
+127.0.0.1:3000
 ```
 
 
