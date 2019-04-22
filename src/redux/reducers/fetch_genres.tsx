@@ -1,8 +1,8 @@
 import { API_CALL_REQUEST, API_CALL_SUCCESS, API_CALL_FAILURE } from '../constants/api_call';
 import { GENRE } from '../constants/types';
-// reducer with initial state
+
 const initialState = {
-    fetching: false,
+    fetching: null,
     data: [],
     error: null
 };

@@ -2,7 +2,7 @@ import { API_CALL_REQUEST, API_CALL_SUCCESS, API_CALL_FAILURE } from '../constan
 import { SEARCH } from '../constants/types';
 
 const initialState = {
-    fetching: false,
+    fetching: null,
     error: null,
     data: null,
     page:null,

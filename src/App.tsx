@@ -8,12 +8,11 @@ import NotFound from './components/not_found';
 import { 
     fetchMovies, 
     fetchGenres, 
-    fetchNewMovies, 
-    fetchNewSearchMovies,
     searchMovies,
     fetchMovieDetails,
     fetchMovieRecommendations,
-    fetchSimilarMovies 
+    fetchSimilarMovies,
+    flushDetailsData 
 } from './redux/actions';
 
 import './App.less';
@@ -28,12 +27,11 @@ export interface AppProps {
     similar:any,
     onRequestMovie: any, 
     onRequestGenre: any, 
-    onNewPageRequest: any,
-    onNewSearchPageRequest:any,
     onSearchMovie:any,
     onNewSelectedMovieDetails:any,
     onMovieRecommendations:any,
-    onSimilarMovies:any  
+    onSimilarMovies:any,
+    onDeleteDetailsData:any 
 };
 
 export interface AppState{
@@ -53,7 +51,6 @@ class App extends React.Component<AppProps,AppState> {
 
     onNewPageRequest=(pageNumber:number)=>{
         window.scrollTo(0, 0);
-        console.log('Page: ', pageNumber);
         if(this.state.currentSource==='movie'){
             this.props.onRequestMovie(pageNumber);
         }else{
@@ -95,9 +92,7 @@ class App extends React.Component<AppProps,AppState> {
     }
 
     render() {               
-        const {movies, genres, details, similar, recommendations, search} = this.props;
-        console.log(movies);
-        
+        const {movies, genres, details, similar, recommendations, search} = this.props;        
         return (
             <Router>
                 <Switch>
@@ -118,6 +113,7 @@ class App extends React.Component<AppProps,AppState> {
                             movieDetails={...details}
                             recommendations={recommendations}
                             similar={similar}
+                            onFlushData={this.props.onDeleteDetailsData}
                             allGenres={genres.data}
                             onSimilarMovies={(id:number)=>this.props.onSimilarMovies(id)} 
                             onMovieRecommendations={(id:number)=>this.props.onMovieRecommendations(id)} 
@@ -144,8 +140,7 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     onRequestMovie: (page:number)=>fetchMovies(dispatch, page)(),
     onRequestGenre: fetchGenres(dispatch),
-    onNewPageRequest: fetchNewMovies(dispatch),
-    onNewSearchPageRequest: fetchNewSearchMovies(dispatch),
+    onDeleteDetailsData:flushDetailsData(dispatch),
     onNewSelectedMovieDetails:(id:number)=>fetchMovieDetails(dispatch, id)(),
     onMovieRecommendations:(id:number)=>fetchMovieRecommendations(dispatch, id)(),
     onSimilarMovies:(id:number)=>fetchSimilarMovies(dispatch, id)(),

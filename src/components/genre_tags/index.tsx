@@ -8,9 +8,13 @@ interface Props { genres_ids: any[], genres: any[] };
 
 const GenreTags: React.FunctionComponent<Props> = ({ genres_ids, genres }: Props) => (
     <div className="movie-genres">
-        {genres_ids.map((id: number) => <Tag key={id} color={colors[Math.ceil(Math.random() * 11) - 1]}>
-            {genres.find(genre => genre.id === id).name}
-        </Tag>
+        {
+            genres_ids.length!==0 &&
+            genres.length!==0 &&
+            genres_ids.map((id: number) => 
+                <Tag key={id} color={colors[Math.ceil(Math.random() * 10) - 1]}>
+                {genres.find(genre => genre.id === id).name}
+            </Tag>
         )}
     </div>
 );

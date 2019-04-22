@@ -1,65 +1,76 @@
 import * as React from 'react';
 import { Container, Row, Col } from 'react-grid-system';
-import { Typography, Divider} from 'antd';
+import { Typography, Divider } from 'antd';
 import StarRatings from 'react-star-ratings';
-import Img from 'react-image';
 
 import BackdropWrapper from '../backdrop_wrapper';
 import AppHeader from '../app_header';
 import GenreTags from '../genre_tags';
 import MovieSwiper from '../movie_swiper';
 import './index.less';
-import {NO_PHOTO_SRC, API_IMG_URL,API_IMG_BACKDROP_SIZE, API_IMG_PLACEHOLDER_SIZE} from '../../api.conf.json';
+import { API_IMG_URL, API_IMG_BACKDROP_SIZE } from '../../api.conf.json';
+import { star } from '../../assets/star.svg.json';
+import imageLoader from '../../utils/image_loader';
+import loadingContent from './loading_content';
 
-
-const {Title, Paragraph}=Typography;
+const { Title, Paragraph } = Typography;
 export interface MovieDetailsProps {
-    match:any, 
-    history:any,
-    onMovieDetails:any, 
-    movieDetails:any, 
-    onSimilarMovies:any,
-    onMovieRecommendations:any,
-    recommendations:any,
-    similar:any,
-    allGenres:any[]
+    match: any,
+    history: any,
+    location: any,
+    onMovieDetails: any,
+    movieDetails: any,
+    onSimilarMovies: any,
+    onMovieRecommendations: any,
+    recommendations: any,
+    similar: any,
+    allGenres: any[],
+    onFlushData: any
 }
- 
+
 class MovieDetails extends React.Component<MovieDetailsProps> {
-    
-    state={
-        id:null
+
+    state = {
+        id: null,
+        error: null
     }
 
-    shouldComponentUpdate(nextProps:MovieDetailsProps){
-        if(this.state.id && this.state.id!==nextProps.match.params.id){
-            console.log("load "+nextProps.match.params.id);
+    shouldComponentUpdate(nextProps: MovieDetailsProps) {
+        if (this.state.id && this.state.id !== nextProps.match.params.id) {
             this.props.onMovieDetails(nextProps.match.params.id);
             this.props.onSimilarMovies(nextProps.match.params.id);
             this.props.onMovieRecommendations(nextProps.match.params.id);
-            this.setState({id:nextProps.match.params.id});
-            window.scrollTo(0, 0);
+            this.setState({ id: nextProps.match.params.id });
         }
         return true;
     }
-    
-    componentWillMount(){
-        console.log(this.state.id);
-        
+
+    componentWillMount() {
+        window.scrollTo(0, 0);
         this.props.onMovieDetails(this.props.match.params.id);
         this.props.onSimilarMovies(this.props.match.params.id);
         this.props.onMovieRecommendations(this.props.match.params.id);
-        this.setState({id:this.props.match.params.id});
+        this.setState({ id: this.props.match.params.id });
     }
 
-    renderMovieDetails=()=>{
-        const { 
-            backdrop_path, 
-            original_title, 
-            poster_path, 
+    componentWillReceiveProps() {
+        if (this.props.match.params.id !== this.state.id) {
+            this.props.onFlushData();
+            window.scrollTo(0, 0);
+        }
+    }
+
+    componentWillUnmount = () => {
+        this.props.onFlushData();
+    }
+
+    renderMovieDetails = () => {
+        const {
+            original_title,
+            poster_path,
             overview,
             homepage,
-            budget, 
+            budget,
             popularity,
             release_date,
             revenue,
@@ -68,36 +79,18 @@ class MovieDetails extends React.Component<MovieDetailsProps> {
             genres,
             production_companies,
             production_countries,
-            vote_average 
-        }=this.props.movieDetails.data;
-
-        let srcPath=[];
-        let placeholderPath=[];
-        if(poster_path===null){
-            srcPath=[NO_PHOTO_SRC];
-            placeholderPath=[NO_PHOTO_SRC];
-        }else{
-            srcPath=[`${API_IMG_URL}w780${poster_path}`, NO_PHOTO_SRC];
-            placeholderPath=[`${API_IMG_URL}${API_IMG_PLACEHOLDER_SIZE}${poster_path}`, NO_PHOTO_SRC];
-        }
+            vote_average
+        } = this.props.movieDetails.data;
 
         return (
-            <BackdropWrapper image_path={`${API_IMG_URL}${API_IMG_BACKDROP_SIZE}/${backdrop_path}`}>
-                <AppHeader showButton={true} onPopularMovies={()=>this.props.history.push('/home')} />
-                <div className="movie-details">
-                    <Container fluid={true}>
-                        <Row justify="between">
-                            <Col md={9}>
-                                <Row justify="between">
+            <div className="movie-details">
+                <Container fluid={true}>
+                    <Row justify="between">
+                        <Col md={9}>
+                            <Row justify="between">
                                 <Col xs={12} sm={6} md={4}>
                                     <div className="movie-details__photo">
-                                        <Img
-                                            src={srcPath}
-                                            loader={<Img
-                                                style={{filter: 'blur(4px)', 'animation': 'hue 3s infinite'}}
-                                                src={placeholderPath}
-                                            />}
-                                        />
+                                        {imageLoader(poster_path, "w500")}
                                     </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={8}>
@@ -105,77 +98,89 @@ class MovieDetails extends React.Component<MovieDetailsProps> {
                                         <Title>
                                             {original_title}
                                         </Title>
-                                            <StarRatings
-                                                rating={vote_average / 2}
-                                                starRatedColor="#01d277"
-                                                starEmptyColor="#adadad"
-                                                numberOfStars={5}
-                                                starDimension="1.4em"
-                                                svgIconViewBox="64 64 896 896"
-                                                svgIconPath='M908.1 353.1l-253.9-36.9L540.7 86.1c-3.1-6.3-8.2-11.4-14.5-14.5-15.8-7.8-35-1.3-42.9 14.5L369.8 316.2l-253.9 36.9c-7 1-13.4 4.3-18.3 9.3a32.05 32.05 0 0 0 .6 45.3l183.7 179.1-43.4 252.9a31.95 31.95 0 0 0 46.4 33.7L512 754l227.1 119.4c6.2 3.3 13.4 4.4 20.3 3.2 17.4-3 29.1-19.5 26.1-36.9l-43.4-252.9 183.7-179.1c5-4.9 8.3-11.3 9.3-18.3 2.7-17.5-9.5-33.7-27-36.3z'
-                                                name="rating"
-                                            />
+                                        <StarRatings
+                                            rating={vote_average / 2}
+                                            starRatedColor="#01d277"
+                                            starEmptyColor="#adadad"
+                                            numberOfStars={5}
+                                            starDimension="1.4em"
+                                            svgIconViewBox="64 64 896 896"
+                                            svgIconPath={star}
+                                            name="rating"
+                                        />
                                         <Title level={3}>{tagline}</Title>
-                                        <a href={homepage}>homepage</a>
+                                        <a href={homepage}>Visit movie website</a>
                                         <Paragraph>{overview}</Paragraph>
                                         <div><b>Release date: </b> {release_date}</div>
                                         <div><b>Revenue: </b> {revenue}</div>
                                         <div><b>Budget: </b> {budget}</div>
                                         <div><b>Popularity: </b> {popularity}</div>
-                                        <div><b>Languages: </b> {spoken_languages.map((i:any)=>i.name+",")}</div>
+                                        <div><b>Languages: </b> {spoken_languages.map((i: any) => i.name + ",")}</div>
+                                        <br /><br />
                                         <Title level={4}>Genres</Title>
-                                        <div>{this.props.allGenres.length!==0 && <GenreTags genres_ids={genres.map((e:any)=>e.id)} genres={this.props.allGenres} />}</div>
+                                        <div>{this.props.allGenres.length !== 0 && <GenreTags genres_ids={genres.map((e: any) => e.id)} genres={this.props.allGenres} />}</div>
                                     </div>
                                 </Col>
                                 <Col md={12}>
-                                    
-                                    {
-                                        this.props.recommendations.data &&
-                                        <MovieSwiper title={"Recommendations"} movies={this.props.recommendations.data.results} genres={this.props.allGenres} />
-                                    }
+                                    {this.props.recommendations.data &&
+                                        <MovieSwiper
+                                            title={"Recommendations"}
+                                            movies={this.props.recommendations.data.results}
+                                            genres={this.props.allGenres} />}
                                 </Col>
                                 <Col md={12}>
-                                    
-                                    {
-                                        this.props.similar.data &&
-                                        <MovieSwiper title={"Similar movies"} movies={this.props.similar.data.results} genres={this.props.allGenres} />
-                                    }
+                                    {this.props.similar.data &&
+                                        <MovieSwiper
+                                            title={"Similar movies"}
+                                            movies={this.props.similar.data.results}
+                                            genres={this.props.allGenres} />}
                                 </Col>
-                                </Row>
-                            </Col>
-                            
-                            <Col xs={12} sm={12} md={3}>
-                                <Title className="sidebar-title" level={4}>Production companies</Title>
-                                {
-                                    production_companies.map((c:any)=>
-                                        <div key={c.id} className="movie-company">
-                                            <span className="movie-company__name">{c.name} ({c.origin_country})</span>                                    
-                                        </div>
-                                    )
-                                }
-                                <Divider dashed={true} />
-                                <Title className="sidebar-title" level={4}>Production countries</Title>
-                                {
-                                    production_countries.map((c:any, k:number)=>
-                                        <div key={k} className="movie-country">
-                                            <span className="movie-country__name">{c.name} ({c.iso_3166_1})</span>                                    
-                                        </div>
-                                    )
-                                }
-                            </Col>
-                        </Row>
-                    </Container>                    
-                </div>
-            </BackdropWrapper>
+                            </Row>
+                        </Col>
+
+                        <Col xs={12} sm={12} md={3}>
+                            <Title className="sidebar-title" level={4}>Production companies</Title>
+                            {production_companies.map((c: any) =>
+                                <div key={c.id} className="movie-company">
+                                    <span className="movie-company__name">{c.name} ({c.origin_country})</span>
+                                </div>
+                            )}
+                            <Divider dashed={true} />
+                            <Title className="sidebar-title" level={4}>Production countries</Title>
+                            {production_countries.map((c: any, k: number) =>
+                                <div key={k} className="movie-country">
+                                    <span className="movie-country__name">{c.name} ({c.iso_3166_1})</span>
+                                </div>
+                            )}
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
         );
     }
 
-    render() { 
-        console.log(this.props);
+    render() {
+        const { data } = this.props.movieDetails;
+        if (this.props.movieDetails.error) {
+            this.props.history.push('/not-found');
+        }
         return (
-            this.props.movieDetails.data ? this.renderMovieDetails() : "Fetching data ..." 
+
+            <React.Fragment>
+                {data ? (
+                    <BackdropWrapper image_path={`${API_IMG_URL}${API_IMG_BACKDROP_SIZE}/${data && data.backdrop_path}`}>
+                        <AppHeader showButton={true} onPopularMovies={() => this.props.history.push('/home')} />
+                        {this.renderMovieDetails()}
+                    </BackdropWrapper>
+                ) : (
+                    <div>
+                        <AppHeader showButton={true} onPopularMovies={() => this.props.history.push('/home')} />
+                        {loadingContent()}
+                    </div>
+                )}
+            </React.Fragment>
         );
     }
 }
- 
+
 export default MovieDetails;

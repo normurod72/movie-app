@@ -2,7 +2,7 @@ import { API_CALL_REQUEST, API_CALL_SUCCESS, API_CALL_FAILURE } from '../constan
 import { SIMILAR_MOVIES } from '../constants/types';
 
 const initialState = {
-    fetching: false,
+    fetching: null,
     data: null,
     error: null
 };

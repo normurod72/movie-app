@@ -26,14 +26,14 @@ const swiper: any = null;
 export interface MovieSwiperProps {
     movies: any[],
     genres: any[],
-    title:string
+    title: string
 };
 
 class MovieSwiper extends React.Component<MovieSwiperProps> {
 
-    swiper=swiper;
+    swiper = swiper;
 
-    parseMovie = (movies: any, n:number=3): any => {
+    parseMovie = (movies: any, n: number = 3): any => {
         const mv = movies.slice(0, Math.floor(movies.length / n) * n);
         return mv.reduce((total: any[], currentValue: any, currentIndex: number, arr: any[]) => {
             if (!total[Math.floor(currentIndex / n)]) { total.push([]); }
@@ -58,11 +58,11 @@ class MovieSwiper extends React.Component<MovieSwiperProps> {
         }
     }
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         this.onFirstSlide();
     }
 
-    onFirstSlide=()=>{
+    onFirstSlide = () => {
         if (this.swiper) {
             this.swiper.slideTo(0);
         }
@@ -70,12 +70,11 @@ class MovieSwiper extends React.Component<MovieSwiperProps> {
 
     render() {
         return (
-            
             <div className="movie-swiper">
                 <Title className="movie-swiper-title" level={3}>
                     {this.props.title}
                     {
-                        this.props.movies.length!==0 &&
+                        this.props.movies.length !== 0 &&
                         <Button.Group>
                             <Button onClick={this.onPrevSlide} type="default">
                                 <Icon type="left" />Backward
@@ -86,7 +85,7 @@ class MovieSwiper extends React.Component<MovieSwiperProps> {
                         </Button.Group>
                     }
                 </Title>
-                {this.props.movies.length===0 && <p>No data found</p>}
+                {this.props.movies.length === 0 && <p>No data found</p>}
                 <Swiper getSwiper={this.getSwiperInstance} {...params}>
                     {this.parseMovie(this.props.movies, 4).map((movieArray: any, key: number) =>
                         <div key={key}>

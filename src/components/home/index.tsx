@@ -21,8 +21,7 @@ interface Props {
 class Home extends React.Component<Props>{
 
     componentWillUnmount(){
-        console.log("Going away");
-        
+        // console.log("Going away");
     }
 
     render(){
