@@ -10,7 +10,7 @@ const initialState = {
 export default function (state = initialState, action: any) {
     switch (action.type) {
         case DETAILS+API_CALL_REQUEST:            
-            return { ...state, fetching: true, error: null };
+            return { ...state, fetching: true, data:null, error: null };
         case FLUSH_DATA:            
             return { ...state, fetching: null, data:null, error: null };
         case DETAILS+API_CALL_SUCCESS:

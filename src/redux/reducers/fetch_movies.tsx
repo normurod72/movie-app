@@ -13,7 +13,7 @@ const initialState = {
 export default function (state :any = initialState, action: any) {
     switch (action.type) {
         case MOVIE+API_CALL_REQUEST:            
-            return { ...state, fetching: true, page:action.page, error: null };
+            return { ...state, fetching: true, page:action.page, data:[], error: null };
         case MOVIE+API_CALL_SUCCESS:    
             return { ...state, fetching: false, error:null, data:action.results, total_results:action.total_results, total_pages:action.total_pages };
         case MOVIE+API_CALL_FAILURE:
